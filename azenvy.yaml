@@ -1,0 +1,67 @@
+esphome:
+  name: azenvy
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret HassApiEncryptionKey
+
+ota:
+  password: !secret OtaPassword
+
+wifi:
+  networks:
+    - ssid: !secret WifiSSID1
+      password: !secret WifiPassword
+    - ssid: !secret WifiSSID2
+      password: !secret WifiPassword
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "AzEnvy Fallback Hotspot"
+    password: !secret FallBackHotspotPassword
+
+captive_portal:
+
+i2c:
+  - sda: GPIO4
+    scl: GPIO5
+    id: bus_a
+
+sensor:
+  - platform: sht3xd
+    i2c_id: bus_a
+    address: 0x44
+
+    temperature:
+      name: "Temperature"
+      id: "envy_temp"
+      filters:
+        - offset: -9.3
+
+    humidity:
+      name: "Humidity"
+      id: "envy_humid"
+      filters:
+        - offset: 22.0
+
+    update_interval: 10s
+
+  - platform: adc
+    pin: A0
+    name: "Gas"
+    update_interval: 10s
+    #filters:
+    #  - multiply: 100
+    #    unit_of_measurement: "%"
+    filters:
+      lambda: |-
+        return (x * 1024/5);
+    unit_of_measurement: "ppm"
+    icon: "mdi:percent"
