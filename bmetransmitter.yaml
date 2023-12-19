@@ -1,0 +1,154 @@
+esphome:
+  name: bmetransmitter
+  includes:
+    - custom_433_switch_dips.h
+  libraries:
+    - "rc-switch"
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret HassApiEncryptionKey
+
+ota:
+  password: !secret OtaPassword
+
+wifi:
+  networks:
+    - ssid: !secret WifiSSID1
+      password: !secret WifiPassword
+    - ssid: !secret WifiSSID2
+      password: !secret WifiPassword
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "BmeTransmitter Fallback Hotspot"
+    password: !secret FallBackHotspotPassword
+
+captive_portal:
+
+i2c:
+
+web_server:
+  port: 80
+
+sensor:
+  - platform: bme280
+    temperature:
+      name: "Temperature"
+      id: "bme_temp"
+      filters:
+       - offset: -3.8
+    pressure:
+      name: "Pressure"
+      id: "bme_pres"
+    humidity:
+      name: "Humidity"
+      id: "bme_humi"
+      filters:
+        - offset: 14.0
+    address: 0x76
+    update_interval: 10s
+
+
+remote_receiver:
+  pin:
+    number: D6
+  dump: rc_switch
+  on_rc_switch:
+    then:
+    - if:
+        condition:
+          lambda: |-
+            return (x.code == 000000010100010101010001);
+        then:
+          - switch.toggle: rf_blackA
+
+switch:
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("11100", "10000", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      id: rf_blackA
+      name: "BlackA"
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("11100", "01000", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "BlackB"
+      id: rf_blackB
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("11100", "00100", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "BlackC"
+      id: rf_blackC
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("11100", "00010", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "BlackD"
+      id: rf_blackD
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("11100", "00001", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "BlackE"
+      id: rf_blackE
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("10100", "10000", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "WhiteA"
+      id: rf_whiteA
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("10100", "01000", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "WhiteB"
+      id: rf_whiteB
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("10100", "00100", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "WhiteC"
+      id: rf_whiteC
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("10100", "00010", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "WhiteD"
+      id: rf_whiteD
+  - platform: custom
+    lambda: |-
+      auto customSwitch = new Custom433SwitchDips("10100", "00001", 24, 1, 14);
+      App.register_component(customSwitch);
+      return {customSwitch};
+    switches:
+      name: "WhiteE"
+      id: rf_whiteE
+
