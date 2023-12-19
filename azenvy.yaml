@@ -43,13 +43,13 @@ sensor:
       name: "Temperature"
       id: "envy_temp"
       filters:
-        - offset: -9.3
+        - offset: -10.3
 
     humidity:
       name: "Humidity"
       id: "envy_humid"
       filters:
-        - offset: 22.0
+        - offset: 25.0
 
     update_interval: 10s
 
