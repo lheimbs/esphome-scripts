@@ -1,0 +1,612 @@
+
+esphome:
+  name: cc1101_env_monitor
+  platform: esp32
+  board: nodemcu-32s
+  includes:
+    - cc1101_32.h
+  libraries:
+    - SPI
+    - "lsatan/SmartRC-CC1101-Driver-Lib@^2.5.7"
+    - "sui77/rc-switch@^2.6.4"
+
+logger:
+  level: debug
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret HassApiEncryptionKey
+
+ota:
+  password: !secret OtaPassword
+
+wifi:
+  networks:
+    - ssid: !secret WifiSSID1
+      password: !secret WifiPassword
+    - ssid: !secret WifiSSID2
+      password: !secret WifiPassword
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "BmeTransmitter Fallback Hotspot"
+    password: !secret FallBackHotspotPassword
+
+captive_portal:
+web_server:
+  port: 80
+
+i2c:
+
+sensor:
+  - platform: bme280
+    temperature:
+      name: "Temperature"
+      id: "bme_temp"
+      filters:
+       - offset: -1.8
+    pressure:
+      name: "Pressure"
+      id: "bme_pres"
+    humidity:
+      name: "Humidity"
+      id: "bme_humi"
+      filters:
+        - offset: 14.0
+    address: 0x76
+    update_interval: 60s
+
+  - platform: custom
+    lambda: |-
+      auto my_sensor = new CC1101();
+      App.register_component(my_sensor);
+      return {my_sensor};
+    sensors:
+      id: transciver
+      internal: true
+
+remote_receiver:
+  pin: 16
+  dump: rc_switch
+  filter: 100us
+  tolerance: 50%
+  idle: 5ms
+
+binary_sensor:
+  - platform: remote_receiver
+    name: WhiteA on
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '10000'
+      state: on
+    on_press:
+      then:
+        - lambda: id(WhiteA).publish_state(true);
+  - platform: remote_receiver
+    name: WhiteA off
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '10000'
+      state: off
+    on_press:
+      then:
+        - lambda: id(WhiteA).publish_state(false);
+
+  - platform: remote_receiver
+    name: WhiteB on
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '01000'
+      state: on
+    on_press:
+      then:
+        - lambda: id(WhiteB).publish_state(true);
+  - platform: remote_receiver
+    name: WhiteB off
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '01000'
+      state: off
+    on_press:
+      then:
+        - lambda: id(WhiteB).publish_state(false);
+
+  - platform: remote_receiver
+    name: WhiteC on
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00100'
+      state: on
+    on_press:
+      then:
+        - lambda: id(WhiteC).publish_state(true);
+  - platform: remote_receiver
+    name: WhiteC off
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00100'
+      state: off
+    on_press:
+      then:
+        - lambda: id(WhiteC).publish_state(false);
+
+  - platform: remote_receiver
+    name: WhiteD on
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00010'
+      state: on
+    on_press:
+      then:
+        - lambda: id(WhiteD).publish_state(true);
+  - platform: remote_receiver
+    name: WhiteD off
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00010'
+      state: off
+    on_press:
+      then:
+        - lambda: id(WhiteD).publish_state(false);
+
+  - platform: remote_receiver
+    name: WhiteE on
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00001'
+      state: on
+    on_press:
+      then:
+        - lambda: id(WhiteE).publish_state(true);
+  - platform: remote_receiver
+    name: WhiteE off
+    internal: true
+    rc_switch_type_a:
+      group: '10100'
+      device: '00001'
+      state: off
+    on_press:
+      then:
+        - lambda: id(WhiteE).publish_state(false);
+
+  - platform: remote_receiver
+    name: BlackA on
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '10000'
+      state: on
+    on_press:
+      then:
+        - lambda: id(BlackA).publish_state(true);
+  - platform: remote_receiver
+    name: BlackA off
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '10000'
+      state: off
+    on_press:
+      then:
+        - lambda: id(BlackA).publish_state(false);
+
+  - platform: remote_receiver
+    name: BlackB on
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '01000'
+      state: on
+    on_press:
+      then:
+        - lambda: id(BlackB).publish_state(true);
+  - platform: remote_receiver
+    name: BlackB off
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '01000'
+      state: off
+    on_press:
+      then:
+        - lambda: id(BlackB).publish_state(false);
+
+  - platform: remote_receiver
+    name: BlackC on
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00100'
+      state: on
+    on_press:
+      then:
+        - lambda: id(BlackC).publish_state(true);
+  - platform: remote_receiver
+    name: BlackC off
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00100'
+      state: off
+    on_press:
+      then:
+        - lambda: id(BlackC).publish_state(false);
+
+  - platform: remote_receiver
+    name: BlackD on
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00010'
+      state: on
+    on_press:
+      then:
+        - lambda: id(BlackD).publish_state(true);
+  - platform: remote_receiver
+    name: BlackD off
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00010'
+      state: off
+    on_press:
+      then:
+        - lambda: id(BlackD).publish_state(false);
+
+  - platform: remote_receiver
+    name: BlackE on
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00001'
+      state: on
+    on_press:
+      then:
+        - lambda: id(BlackE).publish_state(true);
+  - platform: remote_receiver
+    name: BlackE off
+    internal: true
+    rc_switch_type_a:
+      group: '11100'
+      device: '00001'
+      state: off
+    on_press:
+      then:
+        - lambda: id(BlackE).publish_state(false);
+
+remote_transmitter:
+  # - pin: D2 # This is GDO2
+  - pin: 17
+    carrier_duty_percent: 100%
+
+switch:
+  - platform: template
+    id: WhiteA
+    name: WhiteA
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '10000'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteA).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '10000'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteA).publish_state(false);
+
+  - platform: template
+    id: WhiteB
+    name: WhiteB
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '01000'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteB).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '01000'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteB).publish_state(false);
+
+  - platform: template
+    id: WhiteC
+    name: WhiteC
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00100'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteC).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00100'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteC).publish_state(false);
+
+  - platform: template
+    id: WhiteD
+    name: WhiteD
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00010'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteD).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00010'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteD).publish_state(false);
+
+  - platform: template
+    id: WhiteE
+    name: WhiteE
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00001'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteE).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '10100'
+            device: '00001'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(WhiteE).publish_state(false);
+
+
+  - platform: template
+    id: BlackA
+    name: BlackA
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '10000'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackA).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '10000'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackA).publish_state(false);
+
+  - platform: template
+    id: BlackB
+    name: BlackB
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '01000'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackB).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '01000'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackB).publish_state(false);
+
+  - platform: template
+    id: BlackC
+    name: BlackC
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00100'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackC).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00100'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackC).publish_state(false);
+
+  - platform: template
+    id: BlackD
+    name: BlackD
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00010'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackD).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00010'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackD).publish_state(false);
+
+  - platform: template
+    id: BlackE
+    name: BlackE
+    turn_on_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00001'
+            state: on
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackE).publish_state(true);
+    turn_off_action:
+      then:
+        - lambda: get_cc1101(transciver).beginTransmission();
+        - remote_transmitter.transmit_rc_switch_type_a:
+            group: '11100'
+            device: '00001'
+            state: off
+            protocol: 1
+            repeat:
+              times: 20
+              wait_time: 0s
+        - lambda: get_cc1101(transciver).endTransmission();
+        - lambda: get_cc1101(transciver).setRX();
+        - lambda: id(BlackE).publish_state(false);
