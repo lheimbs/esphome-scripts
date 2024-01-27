@@ -1,0 +1,63 @@
+esphome:
+  name: nightlight
+  platform: ESP8266
+  board: d1_mini
+
+logger:
+  level: debug
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret HassApiEncryptionKey
+
+ota:
+  password: !secret OtaPassword
+
+wifi:
+  networks:
+    - ssid: !secret WifiSSID1
+      password: !secret WifiPassword
+    - ssid: !secret WifiSSID2
+      password: !secret WifiPassword
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "BmeTransmitter Fallback Hotspot"
+    password: !secret FallBackHotspotPassword
+
+captive_portal:
+web_server:
+  port: 80
+
+
+light:
+  - platform: neopixelbus
+    id: night_light
+    type: grb
+    pin: D3
+    num_leds: 18
+    name: "Night Light"
+    variant: ws2812
+
+switch:
+  - platform: gpio
+    pin: D2
+    name: "Floor motion detector Enable"
+binary_sensor:
+  - platform: gpio
+    pin: D1
+    name: "Floor motion detector"
+    device_class: motion
+    on_press:
+        - light.turn_on:
+            id: night_light
+            brightness: 100%
+            red: 100%
+            green: 67%
+            blue: 0%
+            transition_length: 1s
+    on_release:
+        - light.turn_off:
+            id: night_light
+            transition_length: 3s
