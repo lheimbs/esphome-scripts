@@ -4,3 +4,4 @@
 /.esphome/
 /.vscode/
 /secrets.yaml
+venv/
