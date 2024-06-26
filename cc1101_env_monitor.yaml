@@ -19,6 +19,7 @@ api:
     key: !secret HassApiEncryptionKey
 
 ota:
+  platform: esphome
   password: !secret OtaPassword
 
 wifi:
@@ -40,7 +41,7 @@ web_server:
 i2c:
 
 sensor:
-  - platform: bme280
+  - platform: bme280_i2c
     temperature:
       name: "Temperature"
       id: "bme_temp"
