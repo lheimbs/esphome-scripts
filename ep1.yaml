@@ -1,0 +1,43 @@
+substitutions:
+  name: everything-presence-one
+  friendly_name: Livingroom EP1
+packages:
+  Everything_Smart_Technology.Everything_Presence_One: github://everythingsmarthome/everything-presence-one/everything-presence-one.yaml@main
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+
+api:
+  encryption:
+    key: !secret HassApiEncryptionKey
+
+wifi:
+  networks:
+    - ssid: !secret WifiSSID1
+      password: !secret WifiPassword
+    - ssid: !secret WifiSSID2
+      password: !secret WifiPassword
+
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+esp32_ble:
+  io_capability: keyboard_only
+
+ble_client:
+  - mac_address: 00:1A:22:1F:98:7F
+    id: eq3_thermostat_1
+    auto_connect: true
+    on_passkey_request:
+      then:
+        - ble_client.passkey_reply:
+            id: eq3_thermostat_1
+            passkey: 1196
