@@ -33,11 +33,19 @@ esp32_ble:
   io_capability: keyboard_only
 
 ble_client:
-  - mac_address: 00:1A:22:1F:98:7F
-    id: eq3_thermostat_1
+  - mac_address: !secret eq3_1_mac_address
+    id: !secret eq3_1_id
     auto_connect: true
     on_passkey_request:
       then:
         - ble_client.passkey_reply:
-            id: eq3_thermostat_1
-            passkey: 1196
+            id: !secret eq3_1_id
+            passkey: !secret eq3_1_passkey
+  - mac_address: !secret eq3_2_mac_address
+    id: !secret eq3_2_id
+    auto_connect: true
+    on_passkey_request:
+      then:
+        - ble_client.passkey_reply:
+            id: !secret eq3_2_id
+            passkey: !secret eq3_2_passkey
