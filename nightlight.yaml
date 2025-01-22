@@ -3,6 +3,19 @@ esphome:
   platform: ESP8266
   board: d1_mini
 
+#  on_boot:
+#    priority: 600
+#    then:
+#      - light.turn_on:
+#          id: night_light
+#          brightness: 100%
+#          red: 100%
+#          green: 67%
+#          blue: 0%
+#      - delay: 60s
+#      - light.turn_off:
+#          id: night_light
+
 logger:
   level: debug
 
@@ -41,19 +54,12 @@ light:
     name: "Night Light"
     variant: ws2812
 
-# switch:
-#   - platform: gpio
-#     pin: D2
-#     name: "Floor motion detector Enable"
 binary_sensor:
   - platform: gpio
     pin:
       number: D1
-      # inverted: true
-
       mode:
         input: true
-        # pullup: true
     name: "Floor motion detector"
     device_class: motion
     # filters:
@@ -76,8 +82,9 @@ sensor:
   - platform: adc
     pin: A0
     name: "LUX Sensor"
-    update_interval: '1s'
+    update_interval: '3s'
     unit_of_measurement: lux
     filters:
       - lambda: |-
           return (x / 10000.0) * 2000000.0;
+
