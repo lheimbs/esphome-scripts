@@ -2,7 +2,7 @@ substitutions:
   name: everything-presence-one
   friendly_name: Livingroom EP1
 packages:
-  Everything_Smart_Technology.Everything_Presence_One: github://everythingsmarthome/everything-presence-one/everything-presence-one.yaml@main
+  Everything_Smart_Technology.Everything_Presence_One: github://everythingsmarthome/everything-presence-one/everything-presence-one-sen0609-ble.yaml@main
 esphome:
   name: ${name}
   name_add_mac_suffix: false
